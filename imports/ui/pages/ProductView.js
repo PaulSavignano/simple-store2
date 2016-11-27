@@ -4,6 +4,10 @@ import { browserHistory } from 'react-router';
 import { Bert } from 'meteor/themeteorchef:bert';
 import { removeProduct } from '../../api/products/methods.js';
 
+const handleNav = (_id) => {
+  browserHistory.push(`/products/${_id}/edit`);
+}
+
 const handleRemove = (_id) => {
   removeProduct.call({ _id }, (error) => {
     if (error) {
@@ -21,7 +25,7 @@ const ProductView = ({ product }) => (
       <h4 className="pull-left">{ product.name }</h4>
       <ButtonToolbar className="pull-right">
         <ButtonGroup bsSize="small">
-          <Button href={`/products/${product._id}/edit`}>Edit</Button>
+          <Button onClick={ () => handleNav(product._id) }>Edit</Button>
           <Button onClick={ () => handleRemove(product._id) } className="text-danger">Delete</Button>
         </ButtonGroup>
       </ButtonToolbar>

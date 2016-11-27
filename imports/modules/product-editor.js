@@ -10,15 +10,13 @@ let component;
 const handleUpsert = () => {
   const { product } = component.props;
   const confirmation = product && product._id ? 'Product updated!' : 'Product added!';
-  console.log(document.querySelector('[name="description"]'))
   const upsert = {
-    description: document.querySelector('[name="description"]').value.trim(),
+    image: document.querySelector('[name="canvas"]').toDataURL('image/jpg'),
+    description: document.querySelector('[name="desc"]').value.trim(),
     name: document.querySelector('[name="name"]').value.trim(),
     price: document.querySelector('[name="price"]').value.trim(),
   };
-
   if (product && product._id) upsert._id = product._id;
-
   upsertProduct.call(upsert, (error, { insertedId }) => {
     if (error) {
       Bert.alert(error.reason, 'danger');
@@ -33,7 +31,7 @@ const handleUpsert = () => {
 const validate = () => {
   $(component.productEditorForm).validate({
     rules: {
-      description: {
+      desc: {
         required: true,
       },
       name: {
@@ -44,7 +42,7 @@ const validate = () => {
       },
     },
     messages: {
-      description: {
+      desc: {
         required: 'Need a description in here.',
       },
       name: {
@@ -60,6 +58,5 @@ const validate = () => {
 
 export default function productEditor(options) {
   component = options.component;
-  console.log(component)
   validate();
 }
