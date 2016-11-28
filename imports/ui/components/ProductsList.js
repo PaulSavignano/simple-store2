@@ -1,18 +1,37 @@
 import React from 'react';
-import { browserHistory } from 'react-router';
-import { ListGroup, ListGroupItem, Alert } from 'react-bootstrap';
+import { Link } from 'react-router';
+import { ListGroup, ListGroupItem, Alert, Button, Image } from 'react-bootstrap';
+import { Bert } from 'meteor/themeteorchef:bert';
+import { upsertCart } from '../../api/carts/methods.js';
 
-const handleNav = (_id) => {
-  console.log(_id)
-  browserHistory.push(`/products/${_id}`)
-}
+const handleUpsert = (productId, productQty) => {
+  const upsert = {
+    productId,
+    productQty,
+  }
+  upsertCart.call(upsert, (error, response) => {
+    if (error) {
+      Bert.alert(error.reason, 'danger');
+    } else {
+      Bert.alert(`Product added!`, 'success');
+    }
+  });
+};
 
 const ProductsList = ({ products }) => (
   products.length > 0 ?
-  <ListGroup className="DocumentsList">
-    {products.map(({ _id, name }) => (
-      <ListGroupItem key={ _id } onClick={ () => handleNav(_id) }>
-        { name }
+  <ListGroup>
+    {products.map(({ _id, name, image }) => (
+      <ListGroupItem key={ _id } className="clearfix">
+        <Image src={ image } height="50" width="50" thumbnail/>
+        <Link to={`/products/${_id}`}>{ name }</Link>
+        <Button
+          bsStyle="success"
+          className="pull-right"
+          onClick={ () => handleUpsert(_id, '1') }
+        >
+          Add to Cart
+        </Button>
       </ListGroupItem>
     ))}
   </ListGroup> :

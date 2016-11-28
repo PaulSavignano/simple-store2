@@ -24,10 +24,13 @@ const AuthenticatedNavigation = () => (
       <LinkContainer to="/products">
         <NavItem eventKey={ 3 } href="/products">Products</NavItem>
       </LinkContainer>
+      <LinkContainer to="/carts">
+        <NavItem eventKey={ 4 } href="/carts">Carts</NavItem>
+      </LinkContainer>
     </Nav>
     <Nav pullRight>
-      <NavDropdown eventKey={ 4 } title={ userName() } id="basic-nav-dropdown">
-        <MenuItem eventKey={ 4.1 } onClick={ handleLogout }>Logout</MenuItem>
+      <NavDropdown eventKey={ 5 } title={ userName() } id="basic-nav-dropdown">
+        <MenuItem eventKey={ 5.1 } onClick={ handleLogout }>Logout</MenuItem>
       </NavDropdown>
     </Nav>
   </div>

@@ -15,11 +15,13 @@ import NotFound from '../../ui/pages/NotFound.js';
 import RecoverPassword from '../../ui/pages/RecoverPassword.js';
 import ResetPassword from '../../ui/pages/ResetPassword.js';
 import Signup from '../../ui/pages/Signup.js';
+
 import Products from '../../ui/pages/Products';
 import ProductNew from '../../ui/pages/ProductNew';
 import ProductEdit from '../../ui/containers/ProductEdit';
 import ProductView from '../../ui/containers/ProductView';
 
+import Carts from '../../ui/pages/Carts';
 
 const authenticate = (nextState, replace) => {
   if (!Meteor.loggingIn() && !Meteor.userId()) {
@@ -39,6 +41,7 @@ Meteor.startup(() => {
         <Route name="productNew" path="/products/new" component={ ProductNew } onEnter={ authenticate } />
         <Route name="productEdit" path="/products/:_id/edit" component={ ProductEdit } onEnter={ authenticate } />
         <Route name="productView" path="/products/:_id" component={ ProductView } onEnter={ authenticate } />
+        <Route name="carts" path="/carts" component={ Carts } onEnter={ authenticate } />
         <Route name="documents" path="/documents" component={ Documents } onEnter={ authenticate } />
         <Route name="newDocument" path="/documents/new" component={ NewDocument } onEnter={ authenticate } />
         <Route name="editDocument" path="/documents/:_id/edit" component={ EditDocument } onEnter={ authenticate } />
