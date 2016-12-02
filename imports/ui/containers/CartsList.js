@@ -5,11 +5,10 @@ import CartsList from '../components/CartsList'
 import Loading from '../components/Loading'
 
 const composer = (params, onData) => {
-  const cartsSub = Meteor.subscribe('carts.list');
-  const productsSub = Meteor.subscribe('products.list')
-  if (cartsSub.ready() && productsSub.ready()) {
+  const subscription = Meteor.subscribe('carts.list');
+  if (subscription.ready()) {
     const owner = Meteor.userId();
-    const carts = owner ? Carts.find({ owner }).fetch() : [];
+    const carts = owner ? Carts.findOne({ _id: owner }) : []
     onData(null, { carts })
   }
 }

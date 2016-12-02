@@ -23,10 +23,10 @@ export default class ProductEditor extends React.Component {
         onSubmit={ event => event.preventDefault() }
       >
         <Row>
-          <Col xs={ 6 } sm={ 6 }>
+          <Col xs={ 12 } sm={ 6 }>
             <ProductImageEdit image={ imageSrc }/>
           </Col>
-          <Col xs={ 6 } sm={ 6 }>
+          <Col xs={ 12 } sm={ 6 }>
             <FormGroup>
               <ControlLabel>Name</ControlLabel>
               <FormControl

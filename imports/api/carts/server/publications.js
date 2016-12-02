@@ -4,7 +4,7 @@ import Carts from '../carts';
 
 Meteor.publish('carts.list', function cartsList() {
   const owner = this.userId;
-  if (owner) return Carts.find({ owner });
+  if (owner) return Carts.find({ _id: owner });
   return this.ready();
 });
 
