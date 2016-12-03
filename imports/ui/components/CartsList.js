@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import { ListGroup, ListGroupItem, Alert, Button, Image, FormControl } from 'react-bootstrap';
 import { removeCart } from '../../api/carts/methods.js';
+import { formatPrice } from '../../modules/format-price'
 
 
 const handleRemove = (productId, productQty) => {
@@ -16,19 +17,20 @@ const handleRemove = (productId, productQty) => {
   });
 };
 
-const CartsList = ({ carts }) => {
-  console.log(carts)
+const CartsList = ({ products }) => {
   const style = {
     container: {
       display: 'flex',
       flexFlow: 'row wrap',
     },
-    image: {
-      flex: '0 1 auto',
-    },
     item: {
       flex: '1 1 auto',
       alignSelf: 'stretch',
+    },
+    image: {
+      flex: '0 0 auto',
+      width: '20%',
+      height: '20%',
     },
     descContainer: {
       display: 'flex',
@@ -37,45 +39,55 @@ const CartsList = ({ carts }) => {
       alignItems: 'stretch',
       height: '100%',
     },
+    product: {
+      fontSize: 24,
+      paddingTop: 8,
+    },
     price: {
       float: 'right',
     },
+    addToCart: {
+      display: 'flex',
+      flexFlow: 'row',
+      paddingBottom: 3,
+    },
+    qty: {
+      flex: '1 1 50%',
+    },
+    button: {
+      flex: '1 1 50%',
+    },
   }
   return (
-    carts ?
+    products.length > 0 ?
     <ListGroup>
-      {carts.products.map(({ productId, productQty }) => (
-          <ListGroupItem key={ productId } style={ style.container }>
-            <Image style={ style.image } src="" thumbnail />
-            <div style={ style.item }>
-              <div style={ style.descContainer }>
-                <div>
-                  <h3>
-                    <span style={ style.price }>{ productQty }</span>
-                    <Link to={`/products/${productId}`} style={ style.item }>
-                      { productId }
-                    </Link>
-                  </h3>
-                  <p>{ productId }</p>
-                </div>
-                <div>
-                  <span>
-                    <FormControl type="number"/>
-                  </span>
-                  <Button
-                    style={ style.button }
-                    bsStyle="danger"
-                    className="pull-right"
-                    onClick={ () => handleRemove(productId, productQty) }
-                  >
-                    Remove
-                  </Button>
-                </div>
-
+      {products.map(({ id, name, image, qty, price }) => (
+        <ListGroupItem key={ id } style={ style.container }>
+          <Image style={ style.image } src={ image } thumbnail />
+          <div style={ style.item }>
+            <div style={ style.descContainer }>
+              <div style={ style.product }>
+                <span style={ style.price }>{ formatPrice(price) }</span>
+                <Link to={`/products/${id}`} style={ style.name }>
+                  { name }
+                </Link>
               </div>
-            </div>
+              <form onSubmit={ (e) => handleUpsert(e, id) } style={ style.addToCart }>
+                <FormControl type="number" name="qty" style={ style.qty } defaultValue="1" />
+                <Button
+                  style={ style.button }
+                  bsStyle="danger"
+                  className="pull-right"
+                  type="submit"
+                >
+                  Remove
+                </Button>
+              </form>
 
-          </ListGroupItem>
+            </div>
+          </div>
+
+        </ListGroupItem>
       ))}
     </ListGroup> :
     <Alert bsStyle="warning">No products yet.</Alert>

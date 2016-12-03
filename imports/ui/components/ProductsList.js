@@ -3,14 +3,18 @@ import { Link } from 'react-router';
 import { ListGroup, ListGroupItem, Alert, Button, Image, FormControl } from 'react-bootstrap';
 import { Bert } from 'meteor/themeteorchef:bert';
 import { upsertCart } from '../../api/carts/methods.js';
+import { formatPrice } from '../../modules/format-price'
 
-const handleUpsert = (e) => {
+
+const handleUpsert = (e, productId) => {
   e.preventDefault()
   const form = e.target
-  const productQty = form.children[0]
-  console.log(productQty)
+  const qty = form.querySelector('[name="qty"]').value
+  const productQty = parseInt(qty, 10)
+  console.log(typeof(productQty))
+  console.log(productId)
 
-    /*const upsert = {
+  const upsert = {
     productId,
     productQty,
   }
@@ -22,21 +26,22 @@ const handleUpsert = (e) => {
       console.log(response)
       Bert.alert('Product added!', 'success');
     }
-  });*/
+  });
 };
 
 const ProductsList = ({ products }) => {
+  console.log(products)
   const style = {
     container: {
       display: 'flex',
       flexFlow: 'row wrap',
     },
-    image: {
-      flex: '0 1 auto',
-    },
     item: {
       flex: '1 1 auto',
       alignSelf: 'stretch',
+    },
+    image: {
+      flex: '0 0 auto',
     },
     descContainer: {
       display: 'flex',
@@ -44,6 +49,10 @@ const ProductsList = ({ products }) => {
       justifyContent: 'space-between',
       alignItems: 'stretch',
       height: '100%',
+    },
+    product: {
+      fontSize: 24,
+      paddingTop: 8,
     },
     price: {
       float: 'right',
@@ -68,16 +77,16 @@ const ProductsList = ({ products }) => {
           <div style={ style.item }>
             <div style={ style.descContainer }>
               <div>
-                <h3>
-                  <span style={ style.price }>{ price }</span>
+                <div style={ style.product }>
+                  <span style={ style.price }>{ formatPrice(price) }</span>
                   <Link to={`/products/${_id}`} style={ style.item }>
                     { name }
                   </Link>
-                </h3>
+                </div>
                 <p>{ description }</p>
               </div>
-              <form onSubmit={ (e) => handleUpsert(e) } style={ style.addToCart }>
-                <FormControl type="number" name="qty" style={ style.qty } />
+              <form onSubmit={ (e) => handleUpsert(e, _id) } style={ style.addToCart }>
+                <FormControl type="number" name="qty" style={ style.qty } defaultValue="1" />
                 <Button
                   style={ style.button }
                   bsStyle="success"

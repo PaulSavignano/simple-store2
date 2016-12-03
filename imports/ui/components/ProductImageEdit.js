@@ -24,8 +24,8 @@ class ProductImage extends React.Component {
   }
   handleChange(event) {
     event.preventDefault();
-    const MAX_WIDTH = 500;
-    const MAX_HEIGHT = 500;
+    const MAX_WIDTH = 700;
+    const MAX_HEIGHT = 700;
     const canvas = this.refs.canvas;
     const ctx = canvas.getContext('2d');
     const file = event.target.files[0];

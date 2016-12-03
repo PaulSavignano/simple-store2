@@ -8,7 +8,7 @@ const Carts = () => (
     <Row>
       <Col xs={ 12 }>
         <div className="page-header clearfix">
-          <h4 className="pull-left">Carts</h4>
+          <h4 className="pull-left">Cart</h4>
         </div>
         <CartsList />
       </Col>
