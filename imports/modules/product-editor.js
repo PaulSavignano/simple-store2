@@ -14,7 +14,7 @@ const handleUpsert = () => {
     image: document.querySelector('[name="canvas"]').toDataURL('image/jpg'),
     description: document.querySelector('[name="desc"]').value.trim(),
     name: document.querySelector('[name="name"]').value.trim(),
-    price: document.querySelector('[name="price"]').value.trim(),
+    price: parseInt(document.querySelector('[name="price"]').value.trim(), 10),
   };
   if (product && product._id) upsert._id = product._id;
   upsertProduct.call(upsert, (error, { insertedId }) => {

@@ -21,7 +21,7 @@ import ProductNew from '../../ui/pages/ProductNew';
 import ProductEdit from '../../ui/containers/ProductEdit';
 import ProductView from '../../ui/containers/ProductView';
 
-import Carts from '../../ui/pages/Carts';
+import Cart from '../../ui/containers/CartsList';
 
 const authenticate = (nextState, replace) => {
   if (!Meteor.loggingIn() && !Meteor.userId()) {
@@ -37,11 +37,11 @@ Meteor.startup(() => {
     <Router history={ browserHistory }>
       <Route path="/" component={ App }>
         <IndexRoute name="index" component={ Index } onEnter={ authenticate } />
-        <Route name="products" path="/products" component={ Products } onEnter={ authenticate } />
+        <Route name="products" path="/products" component={ Products } />
         <Route name="productNew" path="/products/new" component={ ProductNew } onEnter={ authenticate } />
         <Route name="productEdit" path="/products/:_id/edit" component={ ProductEdit } onEnter={ authenticate } />
         <Route name="productView" path="/products/:_id" component={ ProductView } onEnter={ authenticate } />
-        <Route name="carts" path="/carts" component={ Carts } onEnter={ authenticate } />
+        <Route name="cart" path="/cart" component={ Cart } />
         <Route name="documents" path="/documents" component={ Documents } onEnter={ authenticate } />
         <Route name="newDocument" path="/documents/new" component={ NewDocument } onEnter={ authenticate } />
         <Route name="editDocument" path="/documents/:_id/edit" component={ EditDocument } onEnter={ authenticate } />

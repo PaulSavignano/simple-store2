@@ -11,25 +11,46 @@ const handleUpsert = (e, productId) => {
   const form = e.target
   const qty = form.querySelector('[name="qty"]').value
   const productQty = parseInt(qty, 10)
-  console.log(typeof(productQty))
-  console.log(productId)
-
   const upsert = {
     productId,
     productQty,
   }
-  upsertCart.call(upsert, (error, response) => {
-    if (error) {
-      Bert.alert(error.reason, 'danger');
-      console.log(error)
-    } else {
-      console.log(response)
-      Bert.alert('Product added!', 'success');
+  if (Meteor.userId()) {
+    upsertCart.call(upsert, (error, response) => {
+      if (error) {
+        Bert.alert(error.reason, 'danger');
+        console.log(error)
+      } else {
+        console.log(response)
+        Bert.alert('Product added!', 'success');
+      }
+    });
+  } else {
+    let cart = []
+    const localCart = localStorage.getItem('Cart')
+    const product = {
+      productId: productId,
+      productQty: productQty
     }
-  });
+    if (localCart) {
+      cart = JSON.parse(localCart)
+      const findProduct = cart.findIndex((pro) => { return pro.productId === product.productId})
+      if (findProduct >= 0) {
+        console.log(findProduct)
+        cart[findProduct].productQty = product.productQty
+        console.log(cart)
+      } else {
+        cart.push(product)
+      }
+    } else {
+      cart.push(product)
+    }
+    localStorage.setItem('Cart', JSON.stringify(cart))
+  }
 };
 
 const ProductsList = ({ products }) => {
+    console.log(Session.get("session_id"))
   console.log(products)
   const style = {
     container: {

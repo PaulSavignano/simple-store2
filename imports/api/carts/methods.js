@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { Random } from 'meteor/random'
 import { SimpleSchema } from 'meteor/aldeed:simple-schema';
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
 import Carts from './carts';
@@ -7,19 +8,32 @@ import rateLimit from '../../modules/rate-limit';
 export const upsertCart = new ValidatedMethod({
   name: 'carts.upsert',
   validate: new SimpleSchema({
-    _id: { type: String, optional: true },
-    cartId: { type: String, optional: true },
+    cartId: { type: String, optional: true, },
     productId: { type: String, optional: true },
     productQty: { type: Number, optional: true },
   }).validator(),
   run(cart) {
-    const cartToInsert = cart;
-    cartToInsert.owner = this.userId;
-    const { owner, productId, productQty } = cartToInsert;
-    const productExists = Carts.findOne({ _id: owner, 'products.productId': productId })
+    const cartToInsert = cart
+    if (!cart.cartId) {
+      cartToInsert.cartId = Random.id()
+      cartToInsert.createdAt = new Date()
+    }
+    const user = this.userId
+    cartToInsert.owner = user ? this.userId : ''
 
+    const { cartId, owner, createdAt, productId, productQty } = cartToInsert;
+    const productExists = Carts.findOne({ _id: cartId, 'products.productId': productId })
     if (productExists) {
-      return Carts.upsert({ _id: owner, 'products.productId': productId }, { $inc: { 'products.$.productQty': 1 }})
+      return Carts.upsert({
+        _id: cartId,
+        owner,
+        createdAt,
+        'products.productId': productId
+      }, {
+        $inc: {
+          'products.$.productQty': productQty
+        }
+      })
     } else {
       const product = {
         products: {
@@ -31,6 +45,20 @@ export const upsertCart = new ValidatedMethod({
     }
   },
 });
+
+export const updateQty = new ValidatedMethod({
+  name: 'carts.qty',
+  validate: new SimpleSchema({
+    productId: { type: String, optional: true },
+    productQty: { type: Number, optional: true },
+  }).validator(),
+  run(cart) {
+    const cartToUpdate = cart
+    cartToUpdate.owner = this.userId
+    const { owner, productId, productQty } = cartToUpdate
+    return Carts.update({ _id: owner, 'products.productId': productId }, { $set: { 'products.$.productQty': productQty } })
+  }
+})
 
 export const removeCart = new ValidatedMethod({
   name: 'carts.remove',

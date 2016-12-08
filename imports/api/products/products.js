@@ -30,7 +30,7 @@ Products.schema = new SimpleSchema({
     label: 'The name of the product',
   },
   price: {
-    type: String,
+    type: Number,
     label: 'The price of the product',
   },
 })

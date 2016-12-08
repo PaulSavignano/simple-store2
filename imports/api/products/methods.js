@@ -10,7 +10,7 @@ export const upsertProduct = new ValidatedMethod({
     description: { type: String, optional: true },
     image: { type: String, optional: true },
     name: { type: String, optional: true },
-    price: { type: String, optional: true },
+    price: { type: Number, optional: true },
   }).validator(),
   run(product) {
     return Products.upsert({ _id: product._id }, { $set: product })

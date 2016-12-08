@@ -1,11 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router';
 import { ListGroup, ListGroupItem, Alert, Button, Image, FormControl } from 'react-bootstrap';
-import { removeCart } from '../../api/carts/methods.js';
+import { removeCart, updateQty } from '../../api/carts/methods.js';
 import { formatPrice } from '../../modules/format-price'
 
+const handleUpdate = (e, productId) => {
+  e.preventDefault()
+  const productQty = parseInt(e.target.value.trim(), 10)
+  updateQty.call({ productId, productQty }, (error, response) => {
+    if (error) {
+      Bert.alert(error.reason, 'danger')
+      console.log(error)
+    } else {
+      console.log(response)
+    }
+  })
+}
 
-const handleRemove = (productId, productQty) => {
+const handleRemove = (e, productId, productQty) => {
+  e.preventDefault()
   removeCart.call({ productId, productQty }, (error, response) => {
     if (error) {
       Bert.alert(error.reason, 'danger');
@@ -18,6 +31,7 @@ const handleRemove = (productId, productQty) => {
 };
 
 const CartsList = ({ products }) => {
+  console.log(products)
   const style = {
     container: {
       display: 'flex',
@@ -31,6 +45,7 @@ const CartsList = ({ products }) => {
       flex: '0 0 auto',
       width: '20%',
       height: '20%',
+      minHeight: '20%',
     },
     descContainer: {
       display: 'flex',
@@ -46,7 +61,7 @@ const CartsList = ({ products }) => {
     price: {
       float: 'right',
     },
-    addToCart: {
+    cartControls: {
       display: 'flex',
       flexFlow: 'row',
       paddingBottom: 3,
@@ -59,7 +74,7 @@ const CartsList = ({ products }) => {
     },
   }
   return (
-    products.length > 0 ?
+    products.length ?
     <ListGroup>
       {products.map(({ id, name, image, qty, price }) => (
         <ListGroupItem key={ id } style={ style.container }>
@@ -72,9 +87,16 @@ const CartsList = ({ products }) => {
                   { name }
                 </Link>
               </div>
-              <form onSubmit={ (e) => handleUpsert(e, id) } style={ style.addToCart }>
-                <FormControl type="number" name="qty" style={ style.qty } defaultValue="1" />
+              <div style={ style.cartControls }>
+                <FormControl
+                  onChange={ (e) => handleUpdate(e, id)}
+                  type="number"
+                  name="qty"
+                  style={ style.qty }
+                  defaultValue={ qty }
+                />
                 <Button
+                  onClick={ (e) => handleRemove(e, id, qty) }
                   style={ style.button }
                   bsStyle="danger"
                   className="pull-right"
@@ -82,7 +104,7 @@ const CartsList = ({ products }) => {
                 >
                   Remove
                 </Button>
-              </form>
+              </div>
 
             </div>
           </div>
@@ -93,9 +115,9 @@ const CartsList = ({ products }) => {
     <Alert bsStyle="warning">No products yet.</Alert>
   )
 }
-/*
+
 CartsList.propTypes = {
-  carts: React.PropTypes.object,
+  products: React.PropTypes.array,
 };
-*/
+
 export default CartsList;
