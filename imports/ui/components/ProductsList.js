@@ -1,4 +1,5 @@
 import React from 'react';
+import { Random } from 'meteor/random'
 import { Link } from 'react-router';
 import { ListGroup, ListGroupItem, Alert, Button, Image, FormControl } from 'react-bootstrap';
 import { Bert } from 'meteor/themeteorchef:bert';
@@ -8,49 +9,31 @@ import { formatPrice } from '../../modules/format-price'
 
 const handleUpsert = (e, productId) => {
   e.preventDefault()
+  const localCart = localStorage.getItem('cartId')
+  if (!localCart) {
+    localStorage.setItem('cartId', Random.id())
+  }
+  const cartId = localStorage.getItem('cartId')
   const form = e.target
   const qty = form.querySelector('[name="qty"]').value
   const productQty = parseInt(qty, 10)
   const upsert = {
+    cartId,
     productId,
     productQty,
   }
-  if (Meteor.userId()) {
-    upsertCart.call(upsert, (error, response) => {
-      if (error) {
-        Bert.alert(error.reason, 'danger');
-        console.log(error)
-      } else {
-        console.log(response)
-        Bert.alert('Product added!', 'success');
-      }
-    });
-  } else {
-    let cart = []
-    const localCart = localStorage.getItem('Cart')
-    const product = {
-      productId: productId,
-      productQty: productQty
-    }
-    if (localCart) {
-      cart = JSON.parse(localCart)
-      const findProduct = cart.findIndex((pro) => { return pro.productId === product.productId})
-      if (findProduct >= 0) {
-        console.log(findProduct)
-        cart[findProduct].productQty = product.productQty
-        console.log(cart)
-      } else {
-        cart.push(product)
-      }
+  upsertCart.call(upsert, (error, response) => {
+    if (error) {
+      Bert.alert(error.reason, 'danger');
+      console.log(error)
     } else {
-      cart.push(product)
+      console.log(response)
+      Bert.alert('Product added!', 'success');
     }
-    localStorage.setItem('Cart', JSON.stringify(cart))
-  }
-};
+  })
+}
 
 const ProductsList = ({ products }) => {
-    console.log(Session.get("session_id"))
   console.log(products)
   const style = {
     container: {

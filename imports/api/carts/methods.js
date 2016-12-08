@@ -14,14 +14,11 @@ export const upsertCart = new ValidatedMethod({
   }).validator(),
   run(cart) {
     const cartToInsert = cart
-    if (!cart.cartId) {
-      cartToInsert.cartId = Random.id()
-      cartToInsert.createdAt = new Date()
-    }
     const user = this.userId
     cartToInsert.owner = user ? this.userId : ''
 
     const { cartId, owner, createdAt, productId, productQty } = cartToInsert;
+    console.log(cartId)
     const productExists = Carts.findOne({ _id: cartId, 'products.productId': productId })
     if (productExists) {
       return Carts.upsert({
@@ -41,7 +38,7 @@ export const upsertCart = new ValidatedMethod({
           productQty: productQty,
         }
       }
-      return Carts.upsert({ _id: owner }, { $push: product })
+      return Carts.upsert({ _id: cartId }, { $push: product })
     }
   },
 });

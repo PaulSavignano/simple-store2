@@ -31,7 +31,6 @@ const handleRemove = (e, productId, productQty) => {
 };
 
 const CartsList = ({ products }) => {
-  console.log(products)
   const style = {
     container: {
       display: 'flex',

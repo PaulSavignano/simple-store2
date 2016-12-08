@@ -6,22 +6,20 @@ import Cart from '../pages/Cart'
 import Loading from '../components/Loading'
 
 const composer = (params, onData) => {
-  const subscription = Meteor.subscribe('cart');
+  const cartId = localStorage.getItem('cartId')
+  const subscription = Meteor.subscribe('cart.list', cartId);
   if (subscription.ready()) {
     let total = 0
     let quantity = 0
-    const owner = Meteor.userId()
-    const productsCol = owner ? Products.find().fetch() : []
-    const carts = owner ? Carts.findOne({ _id: owner }) : []
-    const cartId = carts ? carts.cartId : {}
-    const products = carts ? carts.products.map((cartProduct) => {
-      const id = cartProduct.productId
-      const qty = cartProduct.productQty
+    const query = Meteor.userId() ? { owner: Meteor.userId() } : { _id: cartId }
+    const cart =  Carts.findOne(query)
+    const productsCol = Products.find().fetch()
+    const products = cart ? cart.products.map((cartProduct) => {
       const product = productsCol.find((pro) => {
-        return pro._id === id
+        return pro._id === cartProduct.productId
       })
-      total += qty * product.price
-      quantity += qty
+      quantity += cartProduct.productQty
+      total += cartProduct.productQty * product.price
       return {
         _id: product._id,
         id: cartProduct.productId,

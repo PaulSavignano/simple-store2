@@ -4,18 +4,11 @@ import { NavItem, Badge } from 'react-bootstrap';
 
 
 const CartIcon = ({ eventKey }) => {
-  let total = 0
-  const getCart = localStorage.getItem('Cart')
-  const parseCart = JSON.parse(getCart)
-  const qty = parseCart.map((pro) => {
-    return total += pro.productQty
-  })
-  console.log(total)
   return (
     <LinkContainer to="/cart">
       <NavItem eventKey={ eventKey } href="/cart">
         <i className="fa fa-shopping-cart fa-lg" aria-hidden="true" ></i>
-        <Badge>{ total }</Badge>
+        <Badge>1</Badge>
       </NavItem>
     </LinkContainer>
   )

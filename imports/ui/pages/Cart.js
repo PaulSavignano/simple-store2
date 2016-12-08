@@ -16,7 +16,6 @@ const style = {
 }
 
 const Cart = ({ cartId, products, total, quantity }) => {
-  console.log(cartId)
   return (
     <div className="Carts">
       <Row>
