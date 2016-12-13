@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router';
 import { ListGroup, ListGroupItem, Alert, Button, Image, FormControl } from 'react-bootstrap';
-import { removeCart, updateQty } from '../../api/carts/methods.js';
+import { updateQty, removeCart } from '../../api/carts/methods.js';
 import { formatPrice } from '../../modules/format-price'
 
-const handleUpdate = (e, productId) => {
+const handleUpdate = (e, cartId, productId) => {
   e.preventDefault()
   const productQty = parseInt(e.target.value.trim(), 10)
-  updateQty.call({ productId, productQty }, (error, response) => {
+  updateQty.call({ cartId, productId, productQty }, (error, response) => {
     if (error) {
       Bert.alert(error.reason, 'danger')
       console.log(error)
@@ -17,9 +17,9 @@ const handleUpdate = (e, productId) => {
   })
 }
 
-const handleRemove = (e, productId, productQty) => {
+const handleRemove = (e, cartId, productId, productQty) => {
   e.preventDefault()
-  removeCart.call({ productId, productQty }, (error, response) => {
+  removeCart.call({ cartId, productId, productQty }, (error, response) => {
     if (error) {
       Bert.alert(error.reason, 'danger');
       console.log(error)
@@ -30,7 +30,7 @@ const handleRemove = (e, productId, productQty) => {
   });
 };
 
-const CartsList = ({ products }) => {
+const CartsList = ({ cartId, products }) => {
   const style = {
     container: {
       display: 'flex',
@@ -73,7 +73,6 @@ const CartsList = ({ products }) => {
     },
   }
   return (
-    products.length ?
     <ListGroup>
       {products.map(({ id, name, image, qty, price }) => (
         <ListGroupItem key={ id } style={ style.container }>
@@ -88,14 +87,14 @@ const CartsList = ({ products }) => {
               </div>
               <div style={ style.cartControls }>
                 <FormControl
-                  onChange={ (e) => handleUpdate(e, id)}
+                  onChange={ (e) => handleUpdate(e, cartId, id)}
                   type="number"
                   name="qty"
                   style={ style.qty }
                   defaultValue={ qty }
                 />
                 <Button
-                  onClick={ (e) => handleRemove(e, id, qty) }
+                  onClick={ (e) => handleRemove(e, cartId, id, qty) }
                   style={ style.button }
                   bsStyle="danger"
                   className="pull-right"
@@ -104,14 +103,11 @@ const CartsList = ({ products }) => {
                   Remove
                 </Button>
               </div>
-
             </div>
           </div>
-
         </ListGroupItem>
       ))}
-    </ListGroup> :
-    <Alert bsStyle="warning">No products yet.</Alert>
+    </ListGroup>
   )
 }
 

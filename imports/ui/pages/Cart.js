@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router'
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, Alert } from 'react-bootstrap';
 import CartsList from '../components/CartsList.js';
 import { formatPrice } from '../../modules/format-price'
 
@@ -24,26 +24,31 @@ const Cart = ({ cartId, products, total, quantity }) => {
             <h4 className="pull-left">Cart</h4>
             <h4 className="pull-right">{ formatPrice(total) }</h4>
           </div>
-          <CartsList products={ products } />
-          <div style={ style.container }>
-            <p>Subtotal ({ quantity } items):</p>
-            <p>{ formatPrice(total) }</p>
-          </div>
-          <div style={ style.container }>
-            <p>Shipping:</p>
-            <p>$0.00</p>
-          </div>
-          <div style={ style.container }>
-            <p>Tax:</p>
-            <p>7.5%</p>
-          </div>
-          <hr/>
-          <div style={ style.container }>
-            <h4>Total:</h4>
-            <h4>{ formatPrice(total)}</h4>
-          </div>
-          <br/>
-          <Button style={ style.button } bsStyle="success">Check Out</Button>
+          {products.length ?
+            <div>
+              <CartsList cartId={ cartId } products={ products } />
+              <div style={ style.container }>
+                <p>Subtotal ({ quantity } items):</p>
+                <p>{ formatPrice(total) }</p>
+              </div>
+              <div style={ style.container }>
+                <p>Shipping:</p>
+                <p>$0.00</p>
+              </div>
+              <div style={ style.container }>
+                <p>Tax:</p>
+                <p>7.5%</p>
+              </div>
+              <hr/>
+              <div style={ style.container }>
+                <h4>Total:</h4>
+                <h4>{ formatPrice(total)}</h4>
+              </div>
+              <br/>
+              <Button style={ style.button } bsStyle="success">Check Out</Button>
+            </div>
+          : <Alert bsStyle="warning">No products yet.</Alert>
+          }
         </Col>
       </Row>
     </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Nav, NavItem, Badge } from 'react-bootstrap';
-import CartIcon from './CartIcon'
+import CartIcon from '../containers/CartIcon'
 
 const PublicNavigation = () => (
   <div>

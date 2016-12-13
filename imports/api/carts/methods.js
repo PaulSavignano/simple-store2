@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
-import { Random } from 'meteor/random'
 import { SimpleSchema } from 'meteor/aldeed:simple-schema';
 import { ValidatedMethod } from 'meteor/mdg:validated-method';
+import { Random } from 'meteor/random'
 import Carts from './carts';
 import rateLimit from '../../modules/rate-limit';
 
@@ -12,77 +12,85 @@ export const upsertCart = new ValidatedMethod({
     productId: { type: String, optional: true },
     productQty: { type: Number, optional: true },
   }).validator(),
-  run(cart) {
-    const cartToInsert = cart
-    const user = this.userId
-    cartToInsert.owner = user ? this.userId : ''
-
-    const { cartId, owner, createdAt, productId, productQty } = cartToInsert;
-    console.log(cartId)
-    const productExists = Carts.findOne({ _id: cartId, 'products.productId': productId })
-    if (productExists) {
-      return Carts.upsert({
-        _id: cartId,
-        owner,
-        createdAt,
-        'products.productId': productId
-      }, {
-        $inc: {
-          'products.$.productQty': productQty
-        }
-      })
+  run({ cartId, productId, productQty }) {
+    const push = {
+      products: {
+        productId,
+        productQty,
+      }
+    }
+    if (this.userId) {
+      const owner = this.userId
+      const productExists = Carts.findOne({ _id: cartId, owner, 'products.productId': productId })
+      if (productExists) {
+        return Carts.upsert({ _id: cartId, owner, 'products.productId': productId }, { $inc: { 'products.$.productQty': productQty } })
+      } else {
+        return Carts.upsert({ _id: cartId, owner }, { $set: { createdAt: new Date() }}, { $push: push })
+      }
     } else {
-      const product = {
-        products: {
-          productId: productId,
-          productQty: productQty,
+      const productExists = Carts.findOne({ _id: cartId, 'products.productId': productId })
+      if (productExists) {
+        return Carts.upsert({ _id: cartId, 'products.productId': productId }, { $inc: { 'products.$.productQty': productQty } })
+      } else {
+        const cartExists = Carts.findOne({ _id: cartId })
+        if (cartExists) {
+          return Carts.upsert({ _id: cartId }, { $push: push })
+        } else {
+          return Carts.upsert({ _id: cartId, createdAt: new Date() }, { $push: push })
         }
       }
-      return Carts.upsert({ _id: cartId }, { $push: product })
     }
-  },
+  }
 });
 
 export const updateQty = new ValidatedMethod({
   name: 'carts.qty',
   validate: new SimpleSchema({
+    cartId: { type: String, optional: true },
     productId: { type: String, optional: true },
     productQty: { type: Number, optional: true },
   }).validator(),
-  run(cart) {
-    const cartToUpdate = cart
-    cartToUpdate.owner = this.userId
-    const { owner, productId, productQty } = cartToUpdate
-    return Carts.update({ _id: owner, 'products.productId': productId }, { $set: { 'products.$.productQty': productQty } })
+  run({ cartId, productId, productQty }) {
+    if (this.userId) {
+      const owner = this.userId
+      return Carts.update({ _id: cartId, owner , 'products.productId': productId }, { $set: { 'products.$.productQty': productQty } })
+    } else {
+      return Carts.update({ _id: cartId, 'products.productId': productId }, { $set: { 'products.$.productQty': productQty } })
+    }
   }
 })
 
 export const removeCart = new ValidatedMethod({
   name: 'carts.remove',
   validate: new SimpleSchema({
+    cartId: { type: String },
     productId: { type: String },
     productQty: { type: Number },
   }).validator(),
-  run({ productId, productQty }) {
-    const owner = this.userId
-    const cartToDelete = Carts.findOne({ _id: owner, 'products.productId': productId });
+  run({ cartId, productId, productQty }) {
     const pull = {
       products: {
         productId,
         productQty,
       }
     }
-    if (cartToDelete && owner) {
-      return Carts.update({ _id: owner }, { $pull: pull }, (error, response) => {
+    if (this.userId) {
+      const owner = this.userId
+      return Carts.update({ _id: cartId, owner }, { $pull: pull }, (error, response) => {
         if (response) {
-          const cartsRemaining = Carts.findOne({ _id: owner})
-          if (cartsRemaining.products.length === 0) {
-            return Carts.remove({ _id: owner })
+          if (Carts.findOne({ _id: cartId, owner }).products.length === 0) {
+            return Carts.remove({ _id: cartId, owner })
           }
         }
       })
-    } else if(!owner) {
-      throw new Meteor.Error('500', 'Sorry, that cart is not for you to delete!');
+    } else {
+      return Carts.update({ _id: cartId }, { $pull: pull }, (error, response) => {
+        if (response) {
+          if (Carts.findOne({ _id: cartId }).products.length === 0) {
+            return Carts.remove({ _id: cartId })
+          }
+        }
+      })
     }
   },
 });

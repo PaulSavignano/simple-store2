@@ -1,5 +1,5 @@
-import React from 'react';
-import { Random } from 'meteor/random'
+import React from 'react'
+import { Session } from 'meteor/session'
 import { Link } from 'react-router';
 import { ListGroup, ListGroupItem, Alert, Button, Image, FormControl } from 'react-bootstrap';
 import { Bert } from 'meteor/themeteorchef:bert';
@@ -9,14 +9,9 @@ import { formatPrice } from '../../modules/format-price'
 
 const handleUpsert = (e, productId) => {
   e.preventDefault()
-  const localCart = localStorage.getItem('cartId')
-  if (!localCart) {
-    localStorage.setItem('cartId', Random.id())
-  }
-  const cartId = localStorage.getItem('cartId')
+  const cartId = localStorage.getItem('cartId') ? localStorage.getItem('cartId') : null
   const form = e.target
-  const qty = form.querySelector('[name="qty"]').value
-  const productQty = parseInt(qty, 10)
+  const productQty = parseInt(form.querySelector('[name="qty"]').value, 10)
   const upsert = {
     cartId,
     productId,
@@ -28,13 +23,16 @@ const handleUpsert = (e, productId) => {
       console.log(error)
     } else {
       console.log(response)
+      if (response.insertedId) {
+        Session.set('cartId', response.insertedId)
+        localStorage.setItem('cartId', response.insertedId)
+      }
       Bert.alert('Product added!', 'success');
     }
   })
 }
 
 const ProductsList = ({ products }) => {
-  console.log(products)
   const style = {
     container: {
       display: 'flex',
@@ -100,10 +98,8 @@ const ProductsList = ({ products }) => {
                   Add to Cart
                 </Button>
               </form>
-
             </div>
           </div>
-
         </ListGroupItem>
       ))}
     </ListGroup> :

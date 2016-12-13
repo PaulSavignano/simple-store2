@@ -34,24 +34,3 @@ const composer = (params, onData) => {
 }
 
 export default composeWithTracker(composer, Loading)(Cart)
-
-
-/*
-const cartsCursor = Carts.findOne({
-  _id: owner
-}, {
-  fields: {
-    'products.productId': 1,
-    'products.productQty': 1,
-  }
-})
-console.log(cartsCursor)
-const products = cartsCursor.products.map((product) => {
-  return [
-    product.productQty,
-    Products.findOne({ _id: product.productId}, { fields: { name: 1, price: 1 }})
-  ]
-})
-console.log(products)
-
-*/
