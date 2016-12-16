@@ -4,10 +4,11 @@ import { browserHistory } from 'react-router';
 import { Meteor } from 'meteor/meteor';
 import { Bert } from 'meteor/themeteorchef:bert';
 import './validation.js';
+import { mergeCart } from '../api/carts/methods'
 
 let component;
 
-const login = () => {
+const login = (localId) => {
   const email = document.querySelector('[name="emailAddress"]').value;
   const password = document.querySelector('[name="password"]').value;
 
@@ -16,6 +17,17 @@ const login = () => {
       Bert.alert(error.reason, 'warning');
     } else {
       Bert.alert('Logged in!', 'success');
+      const sessionId = Session.get('cartId')
+      const localId = localStorage.getItem('cartId')
+      console.log(localId)
+      if (sessionId || localId) {
+        const cartId = sessionId ? sessionId : localId
+        mergeCart.call({ cartId }, (error, response) => {
+          if (error) {
+            console.log(error)
+          }
+        })
+      }
 
       const { location } = component.props;
       if (location.state && location.state.nextPathname) {
@@ -27,7 +39,7 @@ const login = () => {
   });
 };
 
-const validate = () => {
+const validate = (localId) => {
   $(component.loginForm).validate({
     rules: {
       emailAddress: {
@@ -47,11 +59,11 @@ const validate = () => {
         required: 'Need a password here.',
       },
     },
-    submitHandler() { login(); },
+    submitHandler() { login(localId); },
   });
 };
 
-export default function handleLogin(options) {
+export default function handleLogin(options, localId) {
   component = options.component;
-  validate();
+  validate(localId);
 }

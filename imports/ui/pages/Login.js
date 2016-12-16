@@ -5,7 +5,8 @@ import handleLogin from '../../modules/login';
 
 export default class Login extends React.Component {
   componentDidMount() {
-    handleLogin({ component: this });
+    const localId = localStorage.getItem('cartId')
+    handleLogin({ component: this }, localId);
   }
 
   handleSubmit(event) {

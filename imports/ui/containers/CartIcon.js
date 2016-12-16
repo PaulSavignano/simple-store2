@@ -10,16 +10,18 @@ const composer = (params, onData) => {
   const localId = localStorage.getItem('cartId')
   const cartId = sessionId ? sessionId : localId
   const subscription = Meteor.subscribe('cart.list', cartId);
+  let quantity = 0
   if (subscription.ready()) {
-    let quantity = 0
     const query = Meteor.userId() ? { owner: Meteor.userId() } : { _id: cartId }
-    const cart =  Carts.findOne(query)
-    console.log(cart)
-    cart ? cart.products.map((cartProduct) => {
-      quantity += cartProduct.productQty
-    }) : []
-    onData(null, { quantity })
+    if (query) {
+      const cart =  Carts.findOne(query)
+      cart ? cart.products.map((cartProduct) => {
+        quantity += cartProduct.productQty
+      }) : []
+    }
   }
+  console.log(quantity)
+  onData(null, { quantity })
 }
 
 export default composeWithTracker(composer, Loading)(CartIcon)

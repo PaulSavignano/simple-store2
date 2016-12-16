@@ -3,9 +3,8 @@ import { Session } from 'meteor/session'
 import { Link } from 'react-router';
 import { ListGroup, ListGroupItem, Alert, Button, Image, FormControl } from 'react-bootstrap';
 import { Bert } from 'meteor/themeteorchef:bert';
-import { upsertCart } from '../../api/carts/methods.js';
+import { upsertCart } from '../../api/carts/methods'
 import { formatPrice } from '../../modules/format-price'
-
 
 const handleUpsert = (e, productId) => {
   e.preventDefault()
@@ -23,8 +22,8 @@ const handleUpsert = (e, productId) => {
       console.log(error)
     } else {
       console.log(response)
+      Session.set('cartId', response.insertedId)
       if (response.insertedId) {
-        Session.set('cartId', response.insertedId)
         localStorage.setItem('cartId', response.insertedId)
       }
       Bert.alert('Product added!', 'success');
