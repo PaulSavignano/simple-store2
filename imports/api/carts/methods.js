@@ -14,6 +14,9 @@ export const upsertCart = new ValidatedMethod({
   }).validator(),
   run({ cartId, productId, productQty }) {
     const cart = Carts.findOne({ _id: cartId })
+    const productExists = cart ? cart.products.find((product) => {
+      return product.productId === productId
+    }) : null
     const push = {
       products: {
         productId,
@@ -23,39 +26,34 @@ export const upsertCart = new ValidatedMethod({
     if (this.userId) {
       const owner = this.userId
       if (cart) {
-        const productExists = cart.products.find((product) => {
-          return product.productId === productId
-        })
         if (productExists) {
-          return Carts.upsert({ _id: cartId, owner, 'products.productId': productId }, { $inc: { 'products.$.productQty': productQty } })
+          return Carts.upsert({ _id: cartId, owner, 'products.productId': productId }, { $inc: { total: productQty, 'products.$.productQty': productQty } })
         } else {
-          return Carts.upsert({ _id: cartId, owner }, { $push: push })
+          return Carts.upsert({ _id: cartId, owner }, { $inc: { total: productQty }, $push: push })
         }
       } else {
         const set = {
           owner,
           createdAt: new Date(),
+          total: productQty,
           products: [{
             productId,
             productQty,
           }]
         }
-        console.log('no cart no product')
         return Carts.upsert({ _id: cartId }, { $set: set })
       }
     } else {
       if (cart) {
-        const productExists = cart.products.find((product) => {
-          return product.productId === productId
-        })
         if (productExists) {
-          return Carts.upsert({ _id: cartId, 'products.productId': productId }, { $inc: { 'products.$.productQty': productQty } })
+          return Carts.upsert({ _id: cartId, 'products.productId': productId }, { $inc: { total: productQty, 'products.$.productQty': productQty } })
         } else {
-          return Carts.upsert({ _id: cartId }, { $push: push })
+          return Carts.upsert({ _id: cartId }, { $inc: { total: productQty }, $push: push })
         }
       } else {
         const set = {
           createdAt: new Date(),
+          total: productQty,
           products: [{
             productId,
             productQty,
@@ -77,9 +75,9 @@ export const updateQty = new ValidatedMethod({
   run({ cartId, productId, productQty }) {
     if (this.userId) {
       const owner = this.userId
-      return Carts.update({ _id: cartId, owner , 'products.productId': productId }, { $set: { 'products.$.productQty': productQty } })
+      return Carts.update({ _id: cartId, owner , 'products.productId': productId }, { $set: { 'products.$.productQty': productQty }, $inc: { total: productQty } })
     } else {
-      return Carts.update({ _id: cartId, 'products.productId': productId }, { $set: { 'products.$.productQty': productQty } })
+      return Carts.update({ _id: cartId, 'products.productId': productId }, { $set: { 'products.$.productQty': productQty }, $inc: { total: productQty } })
     }
   }
 })

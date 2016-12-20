@@ -6,22 +6,21 @@ import CartIcon from '../components/CartIcon'
 import Loading from '../components/Loading'
 
 const composer = (params, onData) => {
-  const sessionId = Session.get('cartId')
-  const localId = localStorage.getItem('cartId')
-  const cartId = sessionId ? sessionId : localId
-  const subscription = Meteor.subscribe('cart.list', cartId);
-  let quantity = 0
-  if (subscription.ready()) {
-    const query = Meteor.userId() ? { owner: Meteor.userId() } : { _id: cartId }
-    if (query) {
-      const cart =  Carts.findOne(query)
-      cart ? cart.products.map((cartProduct) => {
-        quantity += cartProduct.productQty
-      }) : []
+  const cartUpdate = Session.get('cartUpdate')
+  const localCart = localStorage.getItem('cartId')
+  const cartId = cartUpdate ? localCart : null
+  if (cartId) {
+    const subscription = Meteor.subscribe('cart.list', cartId);
+    if (subscription.ready()) {
+      const query = Meteor.userId() ? { owner: Meteor.userId() } : { _id: cartId }
+      const cart = Carts.findOne(query)
+      console.log(cart)
+      const total = cart ? cart.total : 0
+      onData(null, { total })
     }
+  } else {
+    onData(null, { total: 0 })
   }
-  console.log(quantity)
-  onData(null, { quantity })
 }
 
 export default composeWithTracker(composer, Loading)(CartIcon)

@@ -11,17 +11,14 @@ let component;
 const login = (localId) => {
   const email = document.querySelector('[name="emailAddress"]').value;
   const password = document.querySelector('[name="password"]').value;
-
   Meteor.loginWithPassword(email, password, (error) => {
     if (error) {
       Bert.alert(error.reason, 'warning');
     } else {
       Bert.alert('Logged in!', 'success');
-      const sessionId = Session.get('cartId')
-      const localId = localStorage.getItem('cartId')
-      console.log(localId)
-      if (sessionId || localId) {
-        const cartId = sessionId ? sessionId : localId
+      Session.set('cartUpdate', 'b')
+      const cartId = localStorage.getItem('cartId')
+      if (cartId) {
         mergeCart.call({ cartId }, (error, response) => {
           if (error) {
             console.log(error)

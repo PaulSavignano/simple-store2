@@ -9,7 +9,6 @@ const composer = (params, onData) => {
   const cartId = localStorage.getItem('cartId')
   const subscription = Meteor.subscribe('cart.list', cartId);
   if (subscription.ready()) {
-    console.log('subscribed')
     let total = 0
     let quantity = 0
     const query = Meteor.userId() ? { owner: Meteor.userId() } : { _id: cartId }

@@ -22,7 +22,7 @@ const Cart = ({ cartId, products, total, quantity }) => {
         <Col xs={ 12 }>
           <div className="page-header clearfix">
             <h4 className="pull-left">Cart</h4>
-            <h4 className="pull-right">{ formatPrice(total) }</h4>
+            {total ? <h4 className="pull-right">{ formatPrice(total) }</h4> : ''}
           </div>
           {products.length ?
             <div>

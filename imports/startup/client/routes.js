@@ -4,6 +4,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import { Meteor } from 'meteor/meteor';
+import { Session } from 'meteor/session';
 import App from '../../ui/layouts/App.js';
 import Documents from '../../ui/pages/Documents.js';
 import NewDocument from '../../ui/pages/NewDocument.js';
@@ -33,6 +34,7 @@ const authenticate = (nextState, replace) => {
 };
 
 Meteor.startup(() => {
+  Session.set('cartUpdate', 'a')
   render(
     <Router history={ browserHistory }>
       <Route path="/" component={ App }>

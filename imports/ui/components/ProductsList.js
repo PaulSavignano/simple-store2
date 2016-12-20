@@ -22,7 +22,7 @@ const handleUpsert = (e, productId) => {
       console.log(error)
     } else {
       console.log(response)
-      Session.set('cartId', response.insertedId)
+      Session.set('cartUpdate', response.numberAffected)
       if (response.insertedId) {
         localStorage.setItem('cartId', response.insertedId)
       }
